@@ -262,7 +262,7 @@ function getCategoryLabel(category) {
     function renderForm(role, data = {}) {
         currentSetlistId = data.id || null;
         const orderedCategories = songCategories[role];
-        let formHTML = `<div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 space-y-6"><input type="hidden" id="form-role" value="${role}"><div class="grid md:grid-cols-2 gap-4"><input type="text" id="user-name" placeholder="Your Name" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" value="${data.userName || ''}"><input type="date" id="setlist-date" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" value="${data.date || new Date().toISOString().slice(0, 10)}"></div><div id="songs-container" class="space-y-6"></div><div class="flex gap-4 mt-6"><button id="save-setlist-btn" class="w-full bg-sky-600 text-white p-3 rounded-lg hover:bg-sky-700 font-bold transition">${currentSetlistId ? 'Update Setlist' : 'Save Setlist'}</button><button id="cancel-btn" class="w-full bg-slate-300 dark:bg-slate-600 text-slate-800 dark:text-slate-100 p-3 rounded-lg hover:bg-slate-400 dark:hover:bg-slate-500 font-bold transition">Cancel</button></div></div>`;
+        let formHTML = `<div class="bg-white dark:bg-slate-800 p-4 md:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 space-y-6"><input type="hidden" id="form-role" value="${role}"><div class="grid md:grid-cols-2 gap-4"><input type="text" id="user-name" placeholder="Your Name" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" value="${data.userName || ''}"><input type="date" id="setlist-date" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" value="${data.date || new Date().toISOString().slice(0, 10)}"></div><div id="songs-container" class="space-y-6"></div><div class="flex gap-4 mt-6"><button id="save-setlist-btn" class="w-full bg-sky-600 text-white p-3 rounded-full hover:bg-sky-700 font-bold transition">${currentSetlistId ? 'Update Setlist' : 'Save Setlist'}</button><button id="cancel-btn" class="w-full bg-slate-300 dark:bg-slate-600 text-slate-800 dark:text-slate-100 p-3 rounded-full hover:bg-slate-400 dark:hover:bg-slate-500 font-bold transition">Cancel</button></div></div>`;
         setlistFormContainer.innerHTML = formHTML;
         const songsContainer = document.getElementById('songs-container');
         orderedCategories.forEach(cat => {
@@ -277,15 +277,15 @@ function getCategoryLabel(category) {
         const isSongleader = role === 'Songleader';
         const songList = document.getElementById(catId + '-list');
         const songDiv = document.createElement('div');
-        songDiv.className = 'song-entry p-3 bg-slate-100 dark:bg-slate-900/50 rounded-full border border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-3';
+        songDiv.className = 'song-entry p-3 bg-slate-100 dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-3';
         songDiv.innerHTML = `
             <input type="text" class="song-name w-full p-2 bg-white dark:bg-slate-700 border rounded" placeholder="Song Title" value="${song.name || ''}">
             <input type="url" class="song-url w-full p-2 bg-white dark:bg-slate-700 border rounded" placeholder="YouTube/Spotify URL (Optional)" value="${song.url || ''}">
             <input type="text" class="song-key w-full p-2 bg-white dark:bg-slate-700 border rounded" placeholder="Key (e.g., G)" value="${song.key || ''}">
             <input type="number" class="song-bpm w-full p-2 bg-white dark:bg-slate-700 border rounded" placeholder="BPM (e.g., 120)" value="${song.bpm || ''}">
-            ${isSongleader ? `<textarea class="song-sequence w-full p-2 bg-white dark:bg-slate-700 border rounded md:col-span-2" rows="3" placeholder="Sequence/Flow/Notes (Optional)">${song.sequence || ''}</textarea>` : ''}
-            <textarea class="song-lyrics w-full p-2 bg-white dark:bg-slate-700 border rounded md:col-span-2" rows="4" placeholder="Lyrics (Optional)">${song.lyrics || ''}</textarea>
-            <textarea class="song-chords w-full p-2 bg-white dark:bg-slate-700 border rounded md:col-span-2" rows="4" placeholder="Chords (Optional)">${song.chords || ''}</textarea>
+            ${isSongleader ? `<textarea class="song-sequence w-full p-2 bg-white dark:bg-slate-700 border rounded md:col-span-2 resize-y min-h-[120px] md:min-h-[100px]" rows="5" placeholder="Sequence/Flow/Notes (Optional)">${song.sequence || ''}</textarea>` : ''}
+            <textarea class="song-lyrics w-full p-2 bg-white dark:bg-slate-700 border rounded md:col-span-2 resize-y min-h-[120px] md:min-h-[100px]" rows="5" placeholder="Lyrics (Optional)">${song.lyrics || ''}</textarea>
+            <textarea class="song-chords w-full p-2 bg-white dark:bg-slate-700 border rounded md:col-span-2 resize-y min-h-[120px] md:min-h-[100px]" rows="5" placeholder="Chords (Optional)">${song.chords || ''}</textarea>
         `;
         songList.appendChild(songDiv);
     }
@@ -409,6 +409,7 @@ function getCategoryLabel(category) {
         if (target.id === 'cancel-btn') {
             setlistFormContainer.classList.add('hidden');
             setlistPreviews.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // 👈 scroll to top on cancel
         }
         if (target.matches('.edit-btn')) {
             const id = target.dataset.id;
