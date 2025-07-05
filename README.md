@@ -6,16 +6,17 @@ Built with vanilla HTML, Tailwind CSS, and plain JavaScript, and powered by a Fi
 
 ## ✨ Features
 
+* **Real-Time Updates:** Using Firestore's `onSnapshot` listener, any changes made to a setlist are reflected instantly for all users without needing a page refresh.
 * **Public Viewing:** Anyone can visit the app and instantly see the latest setlist and a history of past setlists.
-* **Admin Login:** A secure login system for authorized users (managed via Firebase Authentication).
 * **Role-Based Input:** Once logged in, users select their role ("Songleader" or "MC") to see a form tailored to their specific needs.
+* **Ordered Categories:** Song categories for both Songleaders and MCs are always displayed in a predefined, logical order.
 * **Detailed Song Entries:** Users can input song titles, YouTube/Spotify links, musical key, BPM, lyrics, chords, and sequence/flow notes.
 * **View Modals:** On-demand pop-up modals to cleanly display a song's Lyrics, Chords, or Sequence.
 * **Sticky Header:** The main header stays fixed to the top for easy access to login/logout buttons while scrolling.
 * **Grouped Setlists:** Setlists for the most recent date are grouped together under a "Latest Setlist" heading.
 * **Paginated History:** Older setlists are neatly organized into pages to keep the interface clean and fast.
 * **Live Search:** Instantly filter all setlists by song title, leader's name, or role.
-* **Dark Mode:** Automatically adapts to the user's system preference for a light or dark theme.
+* **Automatic Dark Mode:** Adapts to the user's system preference for a light or dark theme.
 * **Responsive Design:** A mobile-first design that looks great on any device, from phones to desktops.
 
 ## 🛠️ Tech Stack
@@ -78,3 +79,20 @@ service cloud.firestore {
     }
   }
 }
+```
+
+Click **"Publish"** to save the rules.
+
+### 4. Running the App
+
+You can now open the `index.html` file in your browser to see the app in action. For the best experience and to test PWA features, it's recommended to serve the files using a local web server.
+
+## Usage
+
+* **Viewers:** Can open the app, scroll through the latest and historical setlists, use the search bar, and view song details (lyrics, chords, sequence).
+* **Admins (Songleaders/MCs):**
+    1.  Click the **"Login"** button and enter their credentials.
+    2.  Once logged in, the **"Create Setlist"** button will appear.
+    3.  Clicking it will prompt them to choose their role.
+    4.  A form tailored to their role will appear, allowing them to add songs and all associated details.
+    5.  They can also **"Edit"** any setlist they have previously created.

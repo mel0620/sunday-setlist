@@ -47,8 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSetlistId = null;
     let currentPage = 1;
     const itemsPerPage = 6;
-    
-    // ## MODIFIED: This object now defines the strict order for categories ##
     const songCategories = {
         Songleader: ['Joyful Songs', 'Solemn Songs'],
         MC: ['Devotion Songs', 'Opening Song', 'Welcome Song', 'Songs for Visitors', 'Special Song', 'Giving Song', 'Pre-Songleading Song']
@@ -59,11 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function showModal(modal) { modal.classList.add('is-visible'); }
     function hideModal(modal) { modal.classList.remove('is-visible'); }
 
-    function loadSetlists() {
-        db.collection('setlists').orderBy('date', 'desc').limit(100).get().then(snapshot => {
+    // ## MODIFIED: This function now sets up a real-time listener ##
+    function listenForSetlists() {
+        db.collection('setlists').orderBy('date', 'desc').limit(100)
+          .onSnapshot(snapshot => {
             allSetlists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            currentPage = 1;
-            renderSetlists(allSetlists);
+            // When data changes, re-render the current view
+            const query = searchBar.value.toLowerCase();
+            const filtered = query ? allSetlists.filter(s => [s.userName, s.role, ...Object.values(s.songs).flat().map(song => song.name)].join(' ').toLowerCase().includes(query)) : allSetlists;
+            renderSetlists(filtered);
+        }, error => {
+            console.error("Error fetching real-time setlists: ", error);
         });
     }
 
@@ -118,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // ## MODIFIED: Now iterates in the predefined order ##
     function renderSetlistCard(id, setlist) {
         let songsHTML = '<div class="mt-4 space-y-3">';
         const orderedCategories = songCategories[setlist.role] || Object.keys(setlist.songs);
@@ -147,10 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md" data-card-id="${id}"><div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3"><div class="pr-4"> <p class="font-bold text-lg text-slate-800 dark:text-slate-100">${new Date(setlist.date + 'T00:00:00').toDateString()}</p><p class="text-slate-500 dark:text-slate-400 text-sm">by ${setlist.userName} (${setlist.role})</p></div><div class="flex gap-2 flex-shrink-0">${editButton}</div></div>${songsHTML}</div>`;
     }
 
-    // ## MODIFIED: Now iterates in the predefined order ##
     function renderForm(role, data = {}) {
         currentSetlistId = data.id || null;
-        const orderedCategories = songCategories[role]; // Use the predefined order
+        const orderedCategories = songCategories[role];
         let formHTML = `<div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 space-y-6"><input type="hidden" id="form-role" value="${role}"><div class="grid md:grid-cols-2 gap-4"><input type="text" id="user-name" placeholder="Your Name" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" value="${data.userName || ''}"><input type="date" id="setlist-date" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" value="${data.date || new Date().toISOString().slice(0, 10)}"></div><div id="songs-container" class="space-y-6"></div><div class="flex gap-4 mt-6"><button id="save-setlist-btn" class="w-full bg-sky-600 text-white p-3 rounded-lg hover:bg-sky-700 font-bold transition">${currentSetlistId ? 'Update Setlist' : 'Save Setlist'}</button><button id="cancel-btn" class="w-full bg-slate-300 dark:bg-slate-600 text-slate-800 dark:text-slate-100 p-3 rounded-lg hover:bg-slate-400 dark:hover:bg-slate-500 font-bold transition">Cancel</button></div></div>`;
         setlistFormContainer.innerHTML = formHTML;
         const songsContainer = document.getElementById('songs-container');
@@ -183,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setlistFormContainer.innerHTML = `<section class="text-center bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-100">Select Your Role</h2><div class="flex flex-col sm:flex-row justify-center gap-4"><button data-role="Songleader" class="role-btn bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition shadow">Songleader</button><button data-role="MC" class="role-btn bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition shadow">MC</button></div></section>`;
     }
 
-    // ## MODIFIED: Now iterates in the predefined order when saving ##
     function saveSetlist() {
         if (!currentUser) { return alert("You must be logged in to save a setlist."); }
         const role = document.getElementById('form-role').value;
@@ -196,8 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         if (!setlistData.userName || !setlistData.date) { return alert('Please fill in your name and the date.'); }
-        
-        const orderedCategories = songCategories[role]; // Use the predefined order
+        const orderedCategories = songCategories[role];
         orderedCategories.forEach(cat => {
             const catId = cat.replace(/\s+/g, '-');
             setlistData.songs[cat] = [];
@@ -240,8 +240,13 @@ document.addEventListener('DOMContentLoaded', () => {
             setlistFormContainer.classList.add('hidden');
             setlistPreviews.classList.remove('hidden');
         }
-        loadSetlists();
+        // The real-time listener will handle the initial render and all subsequent updates.
+        // We just need to re-render here to update the edit buttons based on the new auth state.
+        renderSetlists(allSetlists);
     });
+
+    // ## MODIFIED: This now runs once to attach the listener ##
+    listenForSetlists();
 
     searchBar.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
