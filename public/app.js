@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // 🔁 Centralized category label mapping
+const categoryLabels = {
+  "Special Song": "Special Songs",
+  "Devotion Song": "Devotion Songs",
+  "Opening Song": "Opening Songs",
+  "Welcome Song": "Welcome Songs",
+  "Songs for Visitor": "Songs for Visitors",
+  "Giving Song": "Giving Songs",
+  "Pre-Songleading Song": "Pre-Songleading Songs"
+};
+
+// ✅ Use this function anywhere to get the display label
+function getCategoryLabel(category) {
+  return categoryLabels[category] || category;
+}
+
     // --- 1. CONFIG & INITIALIZATION ---
   const firebaseConfig = {
     apiKey: "AIzaSyACcxwLCgoyCcLONNaFA0G_CpsABgCO8Fg",
@@ -183,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         orderedCategories.forEach(category => {
             if (setlist.songs[category]?.length > 0) {
-                songsHTML += `<div><h4 class="font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-1 mb-2">${category}</h4><ul class="space-y-1 text-slate-600 dark:text-slate-400">`;
+                songsHTML += `<div><h4 class="font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-1 mb-2">${getCategoryLabel(category)}</h4><ul class="space-y-1 text-slate-600 dark:text-slate-400">`;
                 setlist.songs[category].forEach(song => {
                     const keyBpmInfo = song.key || song.bpm ? `<span class="text-xs text-slate-400 dark:text-slate-500"> (Key: ${song.key || 'N/A'}, ${song.bpm || 'N/A'} BPM)</span>` : '';
                     const sanitizedLyrics = song.lyrics ? song.lyrics.replace(/"/g, '&quot;').replace(/'/g, '&#39;') : '';
@@ -214,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orderedCategories.forEach(cat => {
             const catId = cat.replace(/\s+/g, '-');
             const songsData = (data.songs && data.songs[cat]) ? data.songs[cat] : [{}];
-            songsContainer.innerHTML += `<fieldset class="border border-slate-200 dark:border-slate-700 p-4 rounded-lg"><legend class="font-bold px-2 text-slate-600 dark:text-slate-300">${cat}</legend><div id="${catId}-list" class="space-y-4"></div><button type="button" data-catid="${catId}" class="add-song-btn mt-4 text-sky-600 dark:text-sky-500 font-semibold">+ Add Another Song</button></fieldset>`;
+            songsContainer.innerHTML += `<fieldset class="border border-slate-200 dark:border-slate-700 p-4 rounded-lg"><legend class="font-bold px-2 text-slate-600 dark:text-slate-300">${getCategoryLabel(cat)}</legend><div id="${catId}-list" class="space-y-4"></div><button type="button" data-catid="${catId}" class="add-song-btn mt-4 text-sky-600 dark:text-sky-500 font-semibold">+ Add Another Song</button></fieldset>`;
             songsData.forEach(song => addSongInput(catId, song, role));
         });
     }
