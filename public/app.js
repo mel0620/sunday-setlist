@@ -200,7 +200,7 @@ function getCategoryLabel(category) {
             const endIndex = startIndex + itemsPerPage;
             const paginatedHistory = historySetlists.slice(startIndex, endIndex);
 
-            let historyHTML = `<h2 class="text-2xl font-bold mt-12 mb-4 text-slate-800 dark:text-slate-200">History</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
+            let historyHTML = `<h2 class="text-2xl font-bold mt-12 mb-4 text-slate-800 dark:text-slate-200">Past Setlists</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
             paginatedHistory.forEach(setlist => {
                 historyHTML += renderSetlistCard(setlist.id, setlist);
             });
