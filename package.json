@@ -1,0 +1,25 @@
+{
+  "name": "sunday-setlist",
+  "version": "1.0.0",
+  "description": "A modern, responsive Progressive Web App (PWA) designed to help church worship teams and service leaders organize and view their Sunday setlists. This application provides a public, view-only interface for all users and a secure, login-protected area for Songleaders and MCs to create, update, and manage setlists.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tailwindcss -i ./src/input.css -o ./output.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./output.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mel0620/sunday-setlist.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mel0620/sunday-setlist/issues"
+  },
+  "homepage": "https://github.com/mel0620/sunday-setlist#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

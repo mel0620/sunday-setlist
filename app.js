@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
 
     // --- 2. DOM ELEMENT REFERENCES ---
+    const offlineIndicator = document.getElementById('offline-indicator');
     const searchBar = document.getElementById('search-bar');
     const loginNavBtn = document.getElementById('login-nav-btn');
     const logoutBtn = document.getElementById('logout-btn');
@@ -49,25 +50,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 6;
     const songCategories = {
         Songleader: ['Joyful Songs', 'Solemn Songs'],
-        MC: ['Devotion Songs', 'Opening Song', 'Welcome Song', 'Songs for Visitors', 'Special Song', 'Giving Song', 'Pre-Songleading Song']
+        MC: ['Devotion Songs', 'Opening Songs', 'Welcome Song', 'Songs for Visitors', 'Special Song', 'Giving Song', 'Pre-Songleading Song']
     };
 
     // --- 4. FUNCTION DECLARATIONS ---
 
     function showModal(modal) { modal.classList.add('is-visible'); }
     function hideModal(modal) { modal.classList.remove('is-visible'); }
+    
+    function handleNetworkChange() {
+        if (navigator.onLine) {
+            offlineIndicator.classList.add('hidden');
+            listenForSetlists(); // Re-establish listener when online
+        } else {
+            offlineIndicator.classList.remove('hidden');
+            // Attempt to load from cache
+            caches.match('setlists-data').then(response => {
+                if (response) {
+                    response.json().then(data => {
+                        allSetlists = data;
+                        renderSetlists(allSetlists);
+                    });
+                }
+            });
+        }
+    }
 
-    // ## MODIFIED: This function now sets up a real-time listener ##
     function listenForSetlists() {
         db.collection('setlists').orderBy('date', 'desc').limit(100)
           .onSnapshot(snapshot => {
             allSetlists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            // When data changes, re-render the current view
-            const query = searchBar.value.toLowerCase();
-            const filtered = query ? allSetlists.filter(s => [s.userName, s.role, ...Object.values(s.songs).flat().map(song => song.name)].join(' ').toLowerCase().includes(query)) : allSetlists;
-            renderSetlists(filtered);
+            
+            // Cache the fresh data
+            if ('caches' in window) {
+                const responseToCache = new Response(JSON.stringify(allSetlists));
+                caches.open('setlist-data-cache-v1').then(cache => {
+                    cache.put('setlists-data', responseToCache);
+                });
+            }
+            
+            renderSetlists(allSetlists);
         }, error => {
-            console.error("Error fetching real-time setlists: ", error);
+            console.error("Firestore listener error: ", error);
+            handleNetworkChange(); // Handle error as being offline
         });
     }
 
@@ -147,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const canEdit = currentUser && currentUser.uid === setlist.userId;
         const editButton = canEdit ? `<button data-id="${id}" class="edit-btn text-sm bg-amber-500 text-white py-1 px-3 rounded-md hover:bg-amber-600 font-semibold transition">Edit</button>` : '';
-        return `<div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md" data-card-id="${id}"><div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3"><div class="pr-4"> <p class="font-bold text-lg text-slate-800 dark:text-slate-100">${new Date(setlist.date + 'T00:00:00').toDateString()}</p><p class="text-slate-500 dark:text-slate-400 text-sm">by ${setlist.userName} (${setlist.role})</p></div><div class="flex gap-2 flex-shrink-0">${editButton}</div></div>${songsHTML}</div>`;
+        return `<div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md"><div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3"><div class="pr-4"> <p class="font-bold text-lg text-slate-800 dark:text-slate-100">${new Date(setlist.date + 'T00:00:00').toDateString()}</p><p class="text-slate-500 dark:text-slate-400 text-sm">by ${setlist.userName} (${setlist.role})</p></div><div class="flex gap-2 flex-shrink-0">${editButton}</div></div>${songsHTML}</div>`;
     }
 
     function renderForm(role, data = {}) {
@@ -240,13 +265,14 @@ document.addEventListener('DOMContentLoaded', () => {
             setlistFormContainer.classList.add('hidden');
             setlistPreviews.classList.remove('hidden');
         }
-        // The real-time listener will handle the initial render and all subsequent updates.
-        // We just need to re-render here to update the edit buttons based on the new auth state.
         renderSetlists(allSetlists);
     });
 
-    // ## MODIFIED: This now runs once to attach the listener ##
-    listenForSetlists();
+    // Initial load
+    handleNetworkChange();
+
+    window.addEventListener('online', handleNetworkChange);
+    window.addEventListener('offline', handleNetworkChange);
 
     searchBar.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();

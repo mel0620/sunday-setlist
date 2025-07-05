@@ -21,7 +21,7 @@
     <!-- Web App Manifest Icons (optional, fallback) -->
     <link rel="icon" type="image/png" sizes="192x192" href="img/favicons/web-app-manifest-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="img/favicons/web-app-manifest-512x512.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="output.css" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <style>
         /* Modal Transitions */
@@ -41,8 +41,11 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
 
-    <div class="container mx-auto p-4 md:p-6">
+    <div id="offline-indicator" class="hidden sticky top-0 z-50 bg-amber-500 text-white text-center p-2 font-semibold">
+        You are currently offline. Showing cached data.
+    </div>
 
+    <div class="container mx-auto p-4 md:p-6">
         <header class="sticky top-0 z-40 flex -mx-4 justify-between items-center mb-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-4 rounded-lg shadow-md">
             <h1 class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">Sunday Setlist</h1>
             <div class="flex items-center gap-2 md:gap-4">
@@ -112,5 +115,17 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="app.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
