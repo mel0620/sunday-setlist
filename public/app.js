@@ -218,9 +218,9 @@ function getCategoryLabel(category) {
         const nextDisabled = currentPage === totalPages ? 'disabled' : '';
 
         paginationContainer.innerHTML = `
-            <button ${prevDisabled} class="prev-page-btn bg-white dark:bg-slate-700 px-4 py-2 rounded-md font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">&laquo; Previous</button>
+            <button ${prevDisabled} class="prev-page-btn bg-white dark:bg-slate-700 px-4 py-2 rounded-full font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">&laquo; Previous</button>
             <span class="font-semibold text-slate-700 dark:text-slate-300">Page ${currentPage} of ${totalPages}</span>
-            <button ${nextDisabled} class="next-page-btn bg-white dark:bg-slate-700 px-4 py-2 rounded-md font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">Next &raquo;</button>
+            <button ${nextDisabled} class="next-page-btn bg-white dark:bg-slate-700 px-4 py-2 rounded-full font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">Next &raquo;</button>
         `;
     }
 
@@ -248,7 +248,14 @@ function getCategoryLabel(category) {
         songsHTML += '</div>';
 
         const canEdit = currentUser && currentUser.uid === setlist.userId;
-        const editButton = canEdit ? `<button data-id="${id}" class="edit-btn text-sm bg-amber-500 text-white py-1 px-3 rounded-md hover:bg-amber-600 font-semibold transition">Edit</button>` : '';
+        const editButton = canEdit
+        ? `<button data-id="${id}" class="edit-btn text-sm bg-amber-500 text-white py-1 px-3 rounded-full hover:bg-amber-600 font-semibold transition flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6 3.536 3.536-6 6H9v-1.536zM5 19h14" />
+            </svg>
+            Edit
+            </button>`
+        : '';
         return `<div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md"><div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3"><div class="pr-4"> <p class="font-bold text-lg text-slate-800 dark:text-slate-100">${new Date(setlist.date + 'T00:00:00').toDateString()}</p><p class="text-slate-500 dark:text-slate-400 text-sm">by ${setlist.userName} (${setlist.role})</p></div><div class="flex gap-2 flex-shrink-0">${editButton}</div></div>${songsHTML}</div>`;
     }
 
@@ -270,7 +277,7 @@ function getCategoryLabel(category) {
         const isSongleader = role === 'Songleader';
         const songList = document.getElementById(catId + '-list');
         const songDiv = document.createElement('div');
-        songDiv.className = 'song-entry p-3 bg-slate-100 dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-3';
+        songDiv.className = 'song-entry p-3 bg-slate-100 dark:bg-slate-900/50 rounded-full border border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-3';
         songDiv.innerHTML = `
             <input type="text" class="song-name w-full p-2 bg-white dark:bg-slate-700 border rounded" placeholder="Song Title" value="${song.name || ''}">
             <input type="url" class="song-url w-full p-2 bg-white dark:bg-slate-700 border rounded" placeholder="YouTube/Spotify URL (Optional)" value="${song.url || ''}">
