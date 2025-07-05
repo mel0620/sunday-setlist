@@ -46,7 +46,7 @@
     </div>
 
     <div class="container mx-auto px-4 pb-4 md:px-6 md:pb-6">
-        <header class="sticky top-0 z-40 flex -mx-6 justify-between items-center mb-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm py-4 px-6 shadow-sm">
+        <header class="fixed inset-x-0 top-0 z-40 flex -mx-2 md:mx-0 justify-between items-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm py-4 px-6 shadow-sm">
             <h1 class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">Sunday Setlist</h1>
             <div class="flex items-center gap-2 md:gap-4">
                 <button id="create-setlist-btn" class="hidden text-sm md:text-base bg-sky-600 text-white py-2 px-4 rounded-full hover:bg-sky-700 transition font-semibold shadow-sm flex items-center gap-2">
@@ -72,7 +72,7 @@
             </div>
         </header>
 
-        <main id="app-container">
+        <main id="app-container" class="mt-24">
             <div class="mb-8">
                 <input type="search" id="search-bar" placeholder="🔍 Search by song, leader, or role..." class="w-full p-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
             </div>
