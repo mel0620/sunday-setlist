@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunday Setlist</title>
-    <!-- Favicon for most browsers -->
+        <!-- Favicon for most browsers -->
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicons/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="img/favicons/favicon-96x96.png">
@@ -29,14 +29,6 @@
         .modal-content { transform: scale(0.95); transition: transform 0.3s ease-in-out; }
         .modal.is-visible { opacity: 1; pointer-events: auto; }
         .modal.is-visible .modal-content { transform: scale(1); }
-
-        /* Print Styles */
-        @media print {
-            body * { visibility: hidden; }
-            .printable-area, .printable-area * { visibility: visible; }
-            .printable-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
-            .no-print { display: none !important; }
-        }
     </style>
     <script>
         // Apply dark mode immediately from localStorage or system preference
@@ -51,7 +43,7 @@
 
     <div class="container mx-auto p-4 md:p-6">
 
-        <header class="flex justify-between items-center mb-8 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md no-print">
+        <header class="sticky top-0 z-40 flex -mx-4 justify-between items-center mb-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-4 rounded-lg shadow-md">
             <h1 class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">Sunday Setlist</h1>
             <div class="flex items-center gap-2 md:gap-4">
                 <button id="create-setlist-btn" class="hidden text-sm md:text-base bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition font-semibold shadow-sm">Create Setlist</button>
@@ -61,7 +53,7 @@
         </header>
 
         <main id="app-container">
-            <div class="mb-8 no-print">
+            <div class="mb-8">
                 <input type="search" id="search-bar" placeholder="🔍 Search by song, leader, or role..." class="w-full p-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
             </div>
 
@@ -69,16 +61,17 @@
             <section id="setlist-previews">
                 <div id="latest-setlist-container"></div>
                 <div id="history-setlists-container"></div>
+                <div id="pagination-container" class="mt-8 flex justify-center items-center gap-4"></div>
             </section>
         </main>
     </div>
 
-    <div id="login-modal" class="modal no-print">
+    <div id="login-modal" class="modal">
         <section class="modal-content relative max-w-md w-full bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl mx-4">
              <button id="close-login-modal-btn" title="Close" class="absolute top-3 right-3 p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <h2 class="text-2xl font-bold mb-6 text-center text-slate-800 dark:text-slate-100">Admin Login</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center text-slate-800 dark:text-slate-100">User Login</h2>
             <div class="space-y-4">
                 <input type="email" id="email" placeholder="Email" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
                 <input type="password" id="password" placeholder="Password" class="w-full p-3 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
@@ -87,8 +80,7 @@
             <p id="login-error" class="text-red-500 text-center mt-4"></p>
         </section>
     </div>
-
-    <div id="lyrics-modal" class="modal no-print">
+    <div id="lyrics-modal" class="modal">
          <div class="modal-content relative max-w-2xl w-full bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl max-h-[80vh] overflow-y-auto mx-4">
              <button id="close-lyrics-modal-btn" title="Close" class="absolute top-3 right-3 p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -97,14 +89,22 @@
              <pre id="lyrics-content" class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap font-sans text-base leading-relaxed"></pre>
          </div>
     </div>
-    
-    <div id="sequence-modal" class="modal no-print">
+    <div id="sequence-modal" class="modal">
          <div class="modal-content relative max-w-2xl w-full bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl max-h-[80vh] overflow-y-auto mx-4">
              <button id="close-sequence-modal-btn" title="Close" class="absolute top-3 right-3 p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
              <h2 id="sequence-song-name" class="text-3xl font-bold mb-6 text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-4"></h2>
              <pre id="sequence-content" class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap font-sans text-base leading-relaxed"></pre>
+         </div>
+    </div>
+    <div id="chords-modal" class="modal">
+         <div class="modal-content relative max-w-2xl w-full bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl max-h-[80vh] overflow-y-auto mx-4">
+             <button id="close-chords-modal-btn" title="Close" class="absolute top-3 right-3 p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+             <h2 id="chords-song-name" class="text-3xl font-bold mb-6 text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-4"></h2>
+             <pre id="chords-content" class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap font-sans text-base leading-relaxed"></pre>
          </div>
     </div>
 

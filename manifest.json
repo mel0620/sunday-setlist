@@ -1,6 +1,6 @@
 {
-  "name": "Sunday Setlist PWA",
-  "short_name": "Setlist",
+  "name": "Sunday Setlist",
+  "short_name": "Sunday Setlist",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f3f4f6",
