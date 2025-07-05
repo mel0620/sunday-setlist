@@ -111,16 +111,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    let isFirstLoad = true; // Add this once in the global scope
+
     function renderSetlists(setlists) {
+        const loader = document.getElementById('setlist-loader');
+        if (loader) loader.classList.add('hidden'); // hide spinner after data is received
+
         latestSetlistContainer.innerHTML = '';
         historySetlistsContainer.innerHTML = '';
         paginationContainer.innerHTML = '';
 
         if (setlists.length === 0) {
-            const message = searchBar.value ? 'No matching setlists found.' : 'No setlist yet. Login to create one!';
-            latestSetlistContainer.innerHTML = `<div class="text-center bg-white dark:bg-slate-800 p-8 rounded-lg shadow-sm"><h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">${message}</h2></div>`;
+            if (!isFirstLoad) {
+                const message = searchBar.value
+                    ? 'No matching setlists found.'
+                    : 'No setlist yet. Login to create one!';
+                latestSetlistContainer.innerHTML = `
+                    <div class="text-center bg-white dark:bg-slate-800 p-8 rounded-lg shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">${message}</h2>
+                    </div>`;
+            }
             return;
         }
+
+        isFirstLoad = false; // only set to false after we have received real data
 
         const latestDate = setlists[0].date;
         const latestSetlists = setlists.filter(s => s.date === latestDate);
@@ -133,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             latestSetlistContainer.innerHTML = latestHTML + '</div>';
         }
-        
+
         if (historySetlists.length > 0) {
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -144,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 historyHTML += renderSetlistCard(setlist.id, setlist);
             });
             historySetlistsContainer.innerHTML = historyHTML + '</div>';
+
             renderPaginationControls(historySetlists.length);
         }
     }
