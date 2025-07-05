@@ -89,6 +89,27 @@ function getCategoryLabel(category) {
 
     function showModal(modal) { modal.classList.add('is-visible'); }
     function hideModal(modal) { modal.classList.remove('is-visible'); }
+
+    function showToast(message, options = {}) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+
+        // Apply custom styles (optional)
+        toast.className = `fixed top-4 right-4 z-[9999] hidden px-4 py-3 rounded-lg shadow-lg transition-opacity duration-300`;
+
+        const color = options.color || 'bg-green-600'; // You can pass color: 'bg-red-600', etc.
+        toast.classList.add(color, 'text-white');
+
+        // Show toast
+        toast.classList.remove('hidden');
+        toast.style.opacity = '1';
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.classList.add('hidden'), 300); // Match duration-300
+        }, options.duration || 3000);
+    }
     
     function handleNetworkChange() {
         if (navigator.onLine) {
@@ -267,7 +288,7 @@ function getCategoryLabel(category) {
     }
 
     function saveSetlist() {
-        if (!currentUser) { return alert("You must be logged in to save a setlist."); }
+        if (!currentUser) { return showToast("You must be logged in to save a setlist.", { color: 'bg-red-600' });}
         const role = document.getElementById('form-role').value;
         const setlistData = {
             userId: currentUser.uid,
@@ -277,7 +298,7 @@ function getCategoryLabel(category) {
             songs: {},
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        if (!setlistData.userName || !setlistData.date) { return alert('Please fill in your name and the date.'); }
+        if (!setlistData.userName || !setlistData.date) { return showToast('Please fill in your name and the date.', { color: 'bg-yellow-500' }); }
         const orderedCategories = songCategories[role];
         orderedCategories.forEach(cat => {
             const catId = cat.replace(/\s+/g, '-');
@@ -300,9 +321,11 @@ function getCategoryLabel(category) {
         });
         const operation = currentSetlistId ? db.collection('setlists').doc(currentSetlistId).set(setlistData, { merge: true }) : db.collection('setlists').add(setlistData);
         operation.then(() => {
-            alert(`Setlist ${currentSetlistId ? 'updated' : 'saved'}!`);
+            showToast(`Setlist ${currentSetlistId ? 'updated' : 'saved'}!`, { color: 'bg-green-600' });
             setlistFormContainer.classList.add('hidden');
             setlistPreviews.classList.remove('hidden');
+            // ✅ Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }).catch(error => { console.error("Error saving setlist: ", error); });
     }
 
@@ -359,6 +382,11 @@ function getCategoryLabel(category) {
         const password = document.getElementById('password').value;
         loginError.textContent = '';
         auth.signInWithEmailAndPassword(email, password).catch(error => { loginError.textContent = error.message; });
+        
+        // ✅ Delay scroll slightly to allow modal animation to finish
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 300); // Adjust timing to match your modal transition (0.3s = 300ms)
     });
 
     document.querySelectorAll('.modal').forEach(modal => {
