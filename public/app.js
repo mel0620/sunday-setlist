@@ -158,12 +158,21 @@ function getCategoryLabel(category) {
         const historySetlists = setlists.filter(s => s.date !== latestDate);
 
         if (latestSetlists.length > 0) {
+            // Sort MC first, then Songleader (case-insensitive just in case)
+            const sortedLatest = [...latestSetlists].sort((a, b) => {
+                if (a.role === b.role) return 0;
+                if (a.role === 'MC') return -1;
+                if (b.role === 'MC') return 1;
+                return 0;
+            });
+
             let latestHTML = `<h2 class="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Latest Setlist (${new Date(latestDate + 'T00:00:00').toDateString()})</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
-            latestSetlists.forEach(setlist => {
+            sortedLatest.forEach(setlist => {
                 latestHTML += renderSetlistCard(setlist.id, setlist);
             });
             latestSetlistContainer.innerHTML = latestHTML + '</div>';
         }
+
 
         if (historySetlists.length > 0) {
             const startIndex = (currentPage - 1) * itemsPerPage;
