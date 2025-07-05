@@ -1,18 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. CONFIG & INITIALIZATION ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyACcxwLCgoyCcLONNaFA0G_CpsABgCO8Fg",
-        authDomain: "sunday-setlist-deb5e.firebaseapp.com",
-        projectId: "sunday-setlist-deb5e",
-        storageBucket: "sunday-setlist-deb5e.appspot.com",
-        messagingSenderId: "942822009419",
-        appId: "1:942822009419:web:3cbc262145d5bd0918bbce"
-    };
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  const firebaseConfig = {
+    apiKey: "AIzaSyACcxwLCgoyCcLONNaFA0G_CpsABgCO8Fg",
+    authDomain: "sunday-setlist-deb5e.firebaseapp.com",
+    projectId: "sunday-setlist-deb5e",
+    storageBucket: "sunday-setlist-deb5e.appspot.com",
+    messagingSenderId: "942822009419",
+    appId: "1:942822009419:web:3cbc262145d5bd0918bbce"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ✅ Enable offline data persistence
+  firebase.firestore().enablePersistence()
+    .then(() => {
+      console.log('✅ Firestore persistence enabled');
+    })
+    .catch((err) => {
+      if (err.code === 'failed-precondition') {
+        console.warn('⚠️ Persistence failed: Multiple tabs open');
+      } else if (err.code === 'unimplemented') {
+        console.warn('⚠️ Persistence is not supported in this browser');
+      }
+    });
 
     // --- 2. DOM ELEMENT REFERENCES ---
     const offlineIndicator = document.getElementById('offline-indicator');
