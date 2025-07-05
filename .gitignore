@@ -1,9 +1,6 @@
 # Node modules
 node_modules/
 
-# Build outputs
-output.css
-
 # OS / IDE junk
 .DS_Store
 Thumbs.db
